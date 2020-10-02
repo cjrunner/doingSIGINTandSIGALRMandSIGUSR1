@@ -23,8 +23,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		2B053503252361F300394C1E /* doingSIGINTandSIGALRM */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = doingSIGINTandSIGALRM; sourceTree = BUILT_PRODUCTS_DIR; };
+		2B053503252361F300394C1E /* doingSIGINTandSIGALRMandSIGUSR1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = doingSIGINTandSIGALRMandSIGUSR1; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B053506252361F300394C1E /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		2B05350E2523624100394C1E /* doingSigIntANDSigAlrm.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = doingSigIntANDSigAlrm.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,7 +50,7 @@
 		2B053504252361F300394C1E /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				2B053503252361F300394C1E /* doingSIGINTandSIGALRM */,
+				2B053503252361F300394C1E /* doingSIGINTandSIGALRMandSIGUSR1 */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -58,6 +59,7 @@
 			isa = PBXGroup;
 			children = (
 				2B053506252361F300394C1E /* main.cpp */,
+				2B05350E2523624100394C1E /* doingSigIntANDSigAlrm.hpp */,
 			);
 			path = doingSIGINTandSIGALRM;
 			sourceTree = "<group>";
@@ -65,9 +67,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		2B053502252361F300394C1E /* doingSIGINTandSIGALRM */ = {
+		2B053502252361F300394C1E /* doingSIGINTandSIGALRMandSIGUSR1 */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 2B05350A252361F300394C1E /* Build configuration list for PBXNativeTarget "doingSIGINTandSIGALRM" */;
+			buildConfigurationList = 2B05350A252361F300394C1E /* Build configuration list for PBXNativeTarget "doingSIGINTandSIGALRMandSIGUSR1" */;
 			buildPhases = (
 				2B0534FF252361F300394C1E /* Sources */,
 				2B053500252361F300394C1E /* Frameworks */,
@@ -77,9 +79,9 @@
 			);
 			dependencies = (
 			);
-			name = doingSIGINTandSIGALRM;
+			name = doingSIGINTandSIGALRMandSIGUSR1;
 			productName = doingSIGINTandSIGALRM;
-			productReference = 2B053503252361F300394C1E /* doingSIGINTandSIGALRM */;
+			productReference = 2B053503252361F300394C1E /* doingSIGINTandSIGALRMandSIGUSR1 */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -108,7 +110,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				2B053502252361F300394C1E /* doingSIGINTandSIGALRM */,
+				2B053502252361F300394C1E /* doingSIGINTandSIGALRMandSIGUSR1 */,
 			);
 		};
 /* End PBXProject section */
@@ -240,6 +242,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				"GCC_PREPROCESSOR_DEFINITIONS[arch=*]" = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -264,7 +270,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		2B05350A252361F300394C1E /* Build configuration list for PBXNativeTarget "doingSIGINTandSIGALRM" */ = {
+		2B05350A252361F300394C1E /* Build configuration list for PBXNativeTarget "doingSIGINTandSIGALRMandSIGUSR1" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				2B05350B252361F300394C1E /* Debug */,
