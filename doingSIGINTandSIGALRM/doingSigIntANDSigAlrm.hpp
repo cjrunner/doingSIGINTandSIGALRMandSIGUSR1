@@ -20,20 +20,19 @@
 #include <list>
 #include <locale>
 #include <sstream> //StringStream
-// #include <stdio.h>
-//#include <signal.h> 
 #include <setjmp.h>
 #include <unistd.h>
 #include <cstdlib>
 #include <sys/types.h>
 #include <time.h>
 #include <stdlib.h>
+#include "signalDescription.hpp"  //The base class which from which MySig derives its
 #define zERO 0
 #define SIGUNKNOWNJUMP  zERO
 #define SIGINTSETJUMP   1
 #define SIGALRMSETJUMP  2
 #define SIGUSR1SETJUMP  3
-#define SIZECIRCULARBUFFER  NUMBEROFELEMENTSINCIRCULARARRAY
+#define SIZECIRCULARBUFFER  NUMBER_OF_ELEMENTS_IN_CIRCULAR_ARRAY
 #define ONE  1
 #define ZERO zERO
 #define SLEEPTIME  10
@@ -43,15 +42,15 @@ typedef struct sigmap {
     int8_t signumber;
     const char *signame;
     const char *sigaction;
-    const char *sigdescription;
+    const char *signalCause;
 } sigmap;
 typedef struct twoUINT8s {
-    atomic<uint8_t>flags;
+    atomic<uint8_t> atomic_flag;
     uint8_t siteid; //Currently, siteid has a max value of 28-decimal, so 8 bits should be sufficient to hold siteid
 } twoINT8s;
 typedef struct circularArray {
-#define NUMBEROFELEMENTSINCIRCULARARRAY 28
-#define MAXINDEXNUMBER NUMBEROFELEMENTSINCIRCULARARRAY-1
+#define NUMBER_OF_ELEMENTS_IN_CIRCULAR_ARRAY 28
+#define MAX_INDEX_NUMBER NUMBER_OF_ELEMENTS_IN_CIRCULAR_ARRAY-1
 #define FLAGS_NOTINUSE      0b00000000
 #define FLAGS_INUSE         0b10000000
 #define FLAGS_SIGNUMBERMASK 0b10011111
@@ -84,7 +83,9 @@ typedef struct  {
 template <class T, class Container = deque<T> > class myqueue;
 #endif
 
-class MySig {
+class MySig : public SI { //Class named MySig first Inherits the base class, named SI. This means that by instatiating an instance  \
+    of MySig, the MySig CONSTRUCTOR will instatiate an instance of the SI class and, thus, the SI CONSTRUCTOR will execute.
+    SI si; 
 typedef void (*p)(MySig *,unsigned int);
 #define MEMBERFUNCTIONSTHATDOSIGHANDLERPOSTPROCESSING 0
 #define MEMBER_FUNCTIONS_THAT_WRANGLE_SIGHANDLER_EXECUTION_TIME 1
@@ -161,9 +162,9 @@ public:
     static void wrangleSIGUSR1startTime(MySig *, unsigned int );
     static void wrangleSIGUNKNOWNstartTime(MySig *, unsigned int);
     int indexOfActiveElement = 0;
-    circularArray A[NUMBEROFELEMENTSINCIRCULARARRAY];
+    circularArray A[NUMBER_OF_ELEMENTS_IN_CIRCULAR_ARRAY];
     circularArray* ptr_begin = &A[0];
-    circularArray* ptr_end   = &A[NUMBEROFELEMENTSINCIRCULARARRAY-1];
+    circularArray* ptr_end   = &A[NUMBER_OF_ELEMENTS_IN_CIRCULAR_ARRAY-1];
     circularArray* ptr_Active_Element = ptr_begin;
     atomic<circularArray *>ptr_Available_Element; // = ptr_begin;
 /*

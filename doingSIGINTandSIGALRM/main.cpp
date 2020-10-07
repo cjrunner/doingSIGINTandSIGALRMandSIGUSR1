@@ -5,42 +5,8 @@
 //  Created by Clifford Campo on 9/29/20.
 //  Copyright © 2020 CliffordCampo. All rights reserved.
 //
-/*   UNIX-defined Signals
- ID  NAME            Default Action          Description
- sigmap signals[] {
- {01 SIGHUP          terminate process       terminal line hangup"},
- 02 SIGINT          terminate process       interrupt program"},
- 03 SIGQUIT         create core image       quit program"},
- 04 SIGILL          create core image       illegal instruction"},
- 05 SIGTRAP         create core image       trace trap"},
- 06 SIGABRT         create core image       abort(3) call (formerly SIGIOT)"},
- 07 SIGEMT          create core image       emulate instruction executed"},
- 08 SIGFPE          create core image       floating-point exception},
- 09 SIGKILL         terminate process       kill program},
- 10 SIGBUS          create core image       bus error},
- 11 SIGSEGV         create core image       segmentation violation},
- 12 SIGSYS          create core image       non-existent system call invoked},
- 13 SIGPIPE         terminate process       write on a pipe with no reader},
- 14 SIGALRM         terminate process       real-time timer expired},
- 15 SIGTERM         terminate process       software termination signal},
- 16 SIGURG          discard signal          urgent condition present on socket},
- 17 SIGSTOP         stop process            stop (cannot be caught or ignored)},
- 18 SIGTSTP         stop process            stop signal generated from keyboard},
- 19 SIGCONT         discard signal          continue after stop
- 20 SIGCHLD         discard signal          child status has changed
- 21 SIGTTIN         stop process            background read attempted from control terminal
- 22 SIGTTOU         stop process            background write attempted to control terminal
- 23 SIGIO           discard signal          I/O is possible on a descriptor (see fcntl(2))
- 24 SIGXCPU         terminate process       cpu time limit exceeded (see setrlimit(2))
- 25 SIGXFSZ         terminate process       file size limit exceeded (see setrlimit(2))
- 26 SIGVTALRM       terminate process       virtual time alarm (see setitimer(2))
- 27 SIGPROF         terminate process       profiling timer alarm (see setitimer(2))
- 28 SIGWINCH        discard signal          Window size change
- 29 SIGINFO         discard signal          status request from keyboard
- 30 SIGUSR1         terminate process       User defined signal 1
- 31 SIGUSR2         terminate process       User defined signal 2
- }
-*/
+
+
 #include "doingSigIntANDSigAlrm.hpp"
 #include "signalDescription.hpp"
 time_t t;
@@ -78,12 +44,13 @@ int   main(int argc, const char **ptrToArrayOfPointersToCString, const char **pt
     int envVariableCounter;
     jmp_buf *jbSI;
     jbSI = &JumpBufferForSIGINT;
-    MySig *ms = new MySig();
+    MySig *ms = new MySig(); // Note that MySig is a class derived from SI.
 #ifdef DEBUG
-    SI *s = new SI();
-    s->signalDescription(SIGINT);
-    s->signalDescription(SIGALRM);
-    s->signalDescription(SIGUSR1);
+//    SI *sigInfo = new SI();
+    ms->SI::signalDescription(SIGINT);  //Need the scope resolution signifier, SI::, in order to make this main program compile \
+    successfully with the base class, named SI. With just ms->signalDescription(SIGINT) the linker projectile vomits
+    ms->SI::signalDescription(SIGALRM);
+    ms->SI::signalDescription(SIGUSR1);
 
     cout << "Hello out there TV-folk, this is program, named \n" << *(ptrToArrayOfPointersToCString + 0) << \
     ", and having a processor id of " << getpid() << ". is ready to demonstrate signal handling. \n" \
@@ -93,7 +60,8 @@ int   main(int argc, const char **ptrToArrayOfPointersToCString, const char **pt
     "the " << ::whichwaitmethod << " method for waiting on either a SIGINT, SIGALRM, or SIGUSR1 signal to occur" << std::endl;
 #endif
     envVariableCounter = 0;
-    //Output the environment variables
+    //Output the environment variables. When in DEBUG mode, there are >23 environment variables. When not in DEBUG mode, then \
+    there are about 21 environment variables
     while (*(ptrToArrayOfPointersPointingToCStrings + envVariableCounter) != 0) {
         if (ms->d) cout << envVariableCounter << ". " << *(ptrToArrayOfPointersPointingToCStrings + envVariableCounter) << \
         " at location " << (ptrToArrayOfPointersPointingToCStrings + envVariableCounter) << endl;
@@ -112,41 +80,6 @@ int   main(int argc, const char **ptrToArrayOfPointersToCString, const char **pt
     &::qEnd  << endl;
 #endif
 
-
-/*
-    ID  NAME            Default Action          Description
-                  01 SIGHUP          terminate process       terminal line hangup
-                  02 SIGINT          terminate process       interrupt program
-                  03 SIGQUIT         create core image       quit program
-                  04 SIGILL          create core image       illegal instruction
-                  05 SIGTRAP         create core image       trace trap
-                  06 SIGABRT         create core image       abort(3) call (formerly SIGIOT)
-                  07 SIGEMT          create core image       emulate instruction executed
-                  08 SIGFPE          create core image       floating-point exception
-                  09 SIGKILL         terminate process       kill program
-                  10 SIGBUS          create core image       bus error
-                  11 SIGSEGV         create core image       segmentation violation
-                  12 SIGSYS          create core image       non-existent system call invoked
-                  13 SIGPIPE         terminate process       write on a pipe with no reader
-                  14 SIGALRM         terminate process       real-time timer expired
-                  15 SIGTERM         terminate process       software termination signal
-                  16 SIGURG          discard signal          urgent condition present on socket
-                  17 SIGSTOP         stop process            stop (cannot be caught or ignored)
-                  18 SIGTSTP         stop process            stop signal generated from keyboard
-                  19 SIGCONT         discard signal          continue after stop
-                  20 SIGCHLD         discard signal          child status has changed
-                  21 SIGTTIN         stop process            background read attempted from control terminal
-                  22 SIGTTOU         stop process            background write attempted to control terminal
-                  23 SIGIO           discard signal          I/O is possible on a descriptor (see fcntl(2))
-                  24 SIGXCPU         terminate process       cpu time limit exceeded (see setrlimit(2))
-                  25 SIGXFSZ         terminate process       file size limit exceeded (see setrlimit(2))
-                  26 SIGVTALRM       terminate process       virtual time alarm (see setitimer(2))
-                  27 SIGPROF         terminate process       profiling timer alarm (see setitimer(2))
-                  28 SIGWINCH        discard signal          Window size change
-                  29 SIGINFO         discard signal          status request from keyboard
-                  30 SIGUSR1         terminate process       User defined signal 1
-                  31 SIGUSR2         terminate process       User defined signal 2
-*/
     while ( (!operatorWantsToQuit) ) {  // loop & then wait, either via pause or sigsuspend, depending upon the presence or \
         absence of the PAUSE precompiler directive for a signal to come through
         ms->setJumpValue=setjmp(JumpBufferForSIGINT); //This is so the operating system will return to the next instruction when \
@@ -184,8 +117,8 @@ int   main(int argc, const char **ptrToArrayOfPointersToCString, const char **pt
     " (SIGUSR1, SIGALRM, SIGINT). setJumpValue: " << ms->setJumpValue << ", the size of the circulary array " << sizeof(ms->A) << \
     " entries. Size of circular array, named A, is " << &ms->ptr_end - &ms->ptr_begin << " bytes. ms->ptr_theSignal = " << \
     ms->ptr_theSignal << ", the return code from " << *::whichwaitmethod << " is " << ms->rc << \
-        " with a description of " << strerror(errno) << ". Note that ::someSignal looks like: " << ::someSignal << endl; //This code gets executed \
-        if we get an interrupt other than the 3 Amigos
+        " with a description of " << strerror(errno) << ". Note that ::someSignal looks like: " << ::someSignal << endl; //This \
+        code gets executed if we get an interrupt other than the 3 Amigos
 
     } //End of while( (!operatorWantsToQuit) ) Loop
     ::msStart = ms->getQstart(); //Have msStart point to the START of this instance object.
@@ -203,10 +136,11 @@ int   main(int argc, const char **ptrToArrayOfPointersToCString, const char **pt
         cout << "ms->accumulateSIGALRMcounts: " << ms->accumulateSIGALRMcounts << "\nms->accumulateSIGALRMtimes: " << \
            ms->accumulateSIGALRMtimes << "\nAverage Execution Time of SIGALRM: " << \
            (ms->accumulateSIGALRMtimes)/(ms->accumulateSIGALRMcounts) << " NanoSeconds" << endl;
-        delete s;  //Remove the pointer to the instance of the the class named SI
+//        delete sigInfo;  //Remove the pointer to the instance of the the class named SI
 #endif
 
-    delete ms; //Remove the pointer to the instance of the the class named MySig
+    delete ms; //Remove the pointer to the instance of the the class named MySig. by deleting the instance of class, named MySig, \
+    we will also delete the instance of the inherited class, named SI.
     return 0;
 } //END OF MAIN    END OF MAIN    END OF MAIN    END OF MAIN    END OF MAIN    END OF MAIN    END OF MAIN    END OF MAIN
 //=================================================================================================================================
@@ -312,7 +246,7 @@ MySig::MySig(void) noexcept(true) {
         signal(SIGINT, MySig::INThandler);        /* initial install Ctrl-C (SIGINT) signal  handler   */
         signal(SIGALRM, MySig::sigalarm_handler); // initial install SIGALRM signal handler
         signal(SIGUSR1, MySig::sigusr1_handler); // initial install SIGUSR1 signal handler
-        signal(SIGUSR2, MySig::sigUNKNOWN_handler);
+        signal(SIGUSR2, MySig::sigUNKNOWN_handler); //sigUNKNOWN_handler processes all signals other than SIGINT, SIGALRM, and SIGUSR1
         signal(SIGHUP, MySig::sigUNKNOWN_handler);
         signal(SIGQUIT, MySig::sigUNKNOWN_handler);
         signal(SIGILL, MySig::sigUNKNOWN_handler);
@@ -364,26 +298,26 @@ MySig::MySig(void) noexcept(true) {
 #endif
     ::whichJump = ZERO; //Make sure this is clean
 //Build a circular array.
-    for (rc = 0; rc < NUMBEROFELEMENTSINCIRCULARARRAY; rc++) {
+    for (rc = 0; rc < NUMBER_OF_ELEMENTS_IN_CIRCULAR_ARRAY; rc++) {
         A[rc].u2x8.flag = 0; //Make sure the two 8-bit components (represented by union as a single 16-bit component) is CLEAN
-        A[rc].c1 = (int8_t)(0b00110000 + rc/10); //Do this so this array Element Number shows up in memory dump as the TENS digit
-        A[rc].c2 = (int8_t)(0b00110000 + rc%10); //Do this so this array Element Number shows up in memory dump as the ONES digit
+        A[rc].c1 = (int8_t)(0b00110000 + rc/10); //Do this so this array's Element Number shows up in a memory dump as the TENS digit
+        A[rc].c2 = (int8_t)(0b00110000 + rc%10); //Do this so this array's Element Number shows up in a memory dump as the ONES digit
 //        A[rc].entryNumber = rc;
         A[rc].myprocessid = getpid();
 //Build the forward-pointers
-        if(rc <  NUMBEROFELEMENTSINCIRCULARARRAY - ONE ) A[rc].ptrToNext = &A[ONE + rc];
+        if(rc <  NUMBER_OF_ELEMENTS_IN_CIRCULAR_ARRAY - ONE ) A[rc].ptrToNext = &A[ONE + rc];
         else {
             A[rc].ptrToNext = &A[0]; //Come here if rc is the array index number of the last array entry so the last array entry \
 will forward-point to the first entry of the array
 //Build the back-pointers
-            A[rc].u2x8.int8s.flags=FLAGS_NOTINUSE;  // = 0b00000000
+            A[rc].u2x8.int8s.atomic_flag=FLAGS_NOTINUSE;  // = 0b00000000
         }
         if (rc != ZERO ) A[rc].ptrToPrevious = &A[rc - ONE]; //Do This if not first array entry so its back pointer points to \
 previous array entry.
         else   {
-            A[rc].ptrToPrevious = &A[ NUMBEROFELEMENTSINCIRCULARARRAY - ONE ]; //Do This if at first array entry so its \
+            A[rc].ptrToPrevious = &A[ NUMBER_OF_ELEMENTS_IN_CIRCULAR_ARRAY - ONE ]; //Do This if at first array entry so its \
             back pointer points to last array entry.
-            A[rc].u2x8.int8s.flags=FLAGS_INUSE;     // = 0b00000001;
+            A[rc].u2x8.int8s.atomic_flag=FLAGS_INUSE;     // = 0b00000001;
         }
  //       pae.store(&A[0]); //Make Element 0 the active element;
     //ptr_Active_Element.store(&A[0]);
@@ -478,7 +412,7 @@ void MySig::doUNKNOWNSIGNAL(MySig *ms, unsigned int i) {
 #endif
 }
 //=================================================================================================================================
-//MANDAGE CIRCULAR ARRAY    MANDAGE CIRCULAR ARRAY    MANDAGE CIRCULAR ARRAY    MANDAGE CIRCULAR ARRAY    MANDAGE CIRCULAR ARRAY
+//CIRCULAR ARRAY MANAGER    CIRCULAR ARRAY MANAGER    CIRCULAR ARRAY MANAGER    CIRCULAR ARRAY MANAGER    CIRCULAR ARRAY MANAGER
 void MySig::manageCircularArray(MySig *ms, unsigned int some_signal) {
 //=================================================================================================================================
 // ATOMIC OPERATION FOLLOWS      ATOMIC OPERATION FOLLOWS      ATOMIC OPERATION FOLLOWS      ATOMIC OPERATION FOLLOWS
@@ -493,43 +427,26 @@ void MySig::manageCircularArray(MySig *ms, unsigned int some_signal) {
 //                            |                                                    |                             |
 //                            |                                                    |                             |
 //                            V                                                    V                             V
-    ms->ptr_Active_Element->u2x8.int8s.flags = ms->ptr_Active_Element->ptrToNext->u2x8.int8s.flags.exchange(FLAGS_INUSE); //make  \
-the next array element, following the current active array element, as the active array element  while ***simultaneously*** \
+    ms->ptr_Active_Element->u2x8.int8s.atomic_flag = ms->ptr_Active_Element->ptrToNext->u2x8.int8s.atomic_flag.exchange(FLAGS_INUSE); // \
+make the next array element, following the current active array element, as the active array element  while ***simultaneously*** \
 deactivating the currently active element.
 // ATOMIC OPERATION COMPLETE      ATOMIC OPERATION COMPLETE      ATOMIC OPERATION COMPLETE      ATOMIC OPERATION COMPLETE
-//     ms->ptr_Active_Element->u2x8.flag = ms->ptr_Active_Element->ptrToNext->u2x8.flags.exchange(0b10000000); //Alternative?
-//=================================================================================================================================
-/*
-#ifdef DEBUG
-    ms->paeWAS = ms->ptr_Active_Element; // Initiate ms->paeWAS with the pointer to the actvie element.
-    ms->indexOfActiveElement++;
-    ms->indexOfActiveElement = ms->indexOfActiveElement % NUMBEROFELEMENTSINCIRCULARARRAY ;
-    ms->cas = \
-    ms->pae.compare_exchange_strong(ms->A[ms->indexOfActiveElement+ONE].ptrToPrevious, \
-    ms->A[ms->indexOfActiveElement].ptrToNext) ;
-    ms->pAE = ms->pae;
-    cout << ms->indexOfActiveElement  << ". Note well: pae.compare_exchange_strong returned " <<  ms->cas << "; paeWas: " \
-    << ms->paeWAS << ", paeIS: " << ms->pae << ". Element ID: " << ms->pAE->c1 << ms->pAE->c1 << endl;
-#endif
-*/
-    ms->indexOfActiveElement++;
-    cout << ms->indexOfActiveElement << ". Active Element ID is: " << ms->ptr_Active_Element->c1 << ms->ptr_Active_Element->c2 << \
-    " Active Element’s Address: " <<  ms->ptr_Active_Element   << ", The flags field looks like: " << \
-    ms->ptr_Active_Element->u2x8.int8s.flags << endl;
-    ms->ptr_Active_Element = ms->ptr_Active_Element->ptrToNext; //Can this be made into an atomic operation, too?
+//     ms->ptr_Active_Element->u2x8.flag = ms->ptr_Active_Element->ptrToNext->u2x8.atomic_flag.exchange(0b10000000); //Alternative?
+    ms->ptr_Active_Element = ms->ptr_Active_Element->ptrToNext; // Point to the new active element (Can this instruction be made \
+    into an atomic operation, too? Too bad there aren't any ATOMIC functions)
+    ms->indexOfActiveElement++; //Can this instruction be included in the much-desired ATOMIC function?
     ms->ptr_Available_Element = ms->ptr_Active_Element->ptrToNext;
-    
- //   ms->ptr_Active_Element->compare_exchange_strong
-    //The next two instructions should be done atomically, perhaps an atomic “compare and swap“
-//--    ms->ptr_Active_Element->flags |= INUSE;  //Set the new active element's in-use flag
+    ms->ptr_Active_Element->stop_tp = std::chrono::high_resolution_clock::now(); //Time stamp this entry. Don't include in this \
+    time-stamp the exection time of the next `cout` instruction
+//=================================================================================================================================
 
-//--    ms->ptr_Active_Element->ptrToPrevious->flags = 0b00000000; //Clear the previously active element's in-use flag making it \
-    available for futre use 
+    bitset<8> the_atomic_flag(ms->ptr_Active_Element->u2x8.int8s.atomic_flag);  //All this just to format data in binary.
+    cout << ms->indexOfActiveElement << ". Active Element ID is: " << ms->ptr_Active_Element->c1 << ms->ptr_Active_Element->c2 << \
+    " Active Element’s Address: " <<  ms->ptr_Active_Element   << ", The atomic_flag field looks like: " << the_atomic_flag << \
+    ms->ptr_Active_Element->u2x8.int8s.atomic_flag << endl;
 
-//--    ms->ptr_Active_Element->flags += (SIGNUMBERMASK & some_signal);
-    ms->ptr_Active_Element->stop_tp = std::chrono::high_resolution_clock::now(); //Time stamp this entry
     ms->ptrToFunction[::whichJump][MEMBER_FUNCTIONS_THAT_WRANGLE_SIGHANDLER_EXECUTION_TIME](ms, ::whichJump);
-} // END MANDAGE CIRCULAR ARRAY     END MANDAGE CIRCULAR ARRAY     END MANDAGE CIRCULAR ARRAY     END MANDAGE CIRCULAR ARRAY
+} // END CIRCULAR ARRAY MANAGER     END CIRCULAR ARRAY MANAGER     END CIRCULAR ARRAY MANAGER     END CIRCULAR ARRAY MANAGER
 //=================================================================================================================================
 void MySig::wrangleSIGALRMstartTime(MySig *ms, unsigned int s) {
     ms->ptr_Active_Element->start_tp = interrupt_Handler_SIGALRM_tp_start;

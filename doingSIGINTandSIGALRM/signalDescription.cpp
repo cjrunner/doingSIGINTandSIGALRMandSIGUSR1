@@ -9,7 +9,7 @@
 #include "doingSigIntANDSigAlrm.hpp"
 #include "signalDescription.hpp"
 /*
-ID  NAME            Default Action          Description
+ID  NAME            Default Action          Description of Cause
 01 SIGHUP          terminate process       terminal line hangup
 02 SIGINT          terminate process       interrupt program
 03 SIGQUIT         create core image       quit program
@@ -49,27 +49,33 @@ void SI::signalDescription (int sigNumber) {
         for (pos = allTheSigs.begin(); pos == allTheSigs.end(); ++pos) {
             cout << (allTheSigs.find(sigNumber))->second.signalNumber << comma;
             cout << pos->first << "………"  << pos->second.theSignal << comma << \
-            pos->second.whatHappens << comma << pos->second.description <<  endl;
+            pos->second.whatHappens << comma << pos->second.signalCause <<  endl;
         }
     } else {
-    /*
+/* Typical output looks like:
      2, 2, SIGINT, interrupt program
      14, 14, SIGALRM, real-time timer expired
      30, 30, SIGUSR1, User defined signal 1
-    */
+*/
         cout << (allTheSigs.find(sigNumber))->second.signalNumber << comma;
         cout << (allTheSigs.find(sigNumber))->first << comma  << \
-        (allTheSigs.find(sigNumber))->second.theSignal << comma << (allTheSigs.find(sigNumber))->second.whatHappens << comma <<  \
-        (allTheSigs.find(sigNumber))->second.description << endl;
+        (allTheSigs.find(sigNumber))->second.theSignal << comma << \
+        (allTheSigs.find(sigNumber))->second.whatHappens << comma <<  \
+        (allTheSigs.find(sigNumber))->second.signalCause << endl;
     }
     
 }
-SI::SI(void) {
-    cout << "Entered the constructor (SI::SI(void)) for this instance of the class named SI" << endl;
+SI::SI(void) { //Note: as soon as we enter the derived class's constructor, named MySig::MySig(void), than control is passed \
+    to this base class's constructor, named SI::SI(void) so the base class can be constructed prior to the derived class \
+    MySig::MySig(void) { … } being constructed
+    cout << "Entered the constructor (SI::SI(void)) for this instance of the class named SI. Let's now initialize the \
+    map container, named allTheSigs, using data from the array of typedefs, named si. The instance of the SI base class is " << \
+    "at location " << this << endl;
     for (i=0; i < NumberOfSignals; i++) { 
         allTheSigs.insert({i, si[i]});
     }
 }
 SI::~SI(void) {
-    cout << "Entered the Destructor (SI::~SI) for this instance of the class named SI" << endl;
+    cout << "Entered the Destructor (SI::~SI) for this instance of the base class, named SI, " << \
+    "which is at location " << this << endl;
 }

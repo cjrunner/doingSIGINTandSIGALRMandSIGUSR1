@@ -8,11 +8,12 @@
 
 #ifndef signalDescription_h
 #define signalDescription_h
+#include <bitset> //for printing binary formatted data
 typedef struct {
     int signalNumber;
-    string theSignal;
-    string whatHappens;
-    string description;
+    std::string theSignal;
+    std::string whatHappens;
+    std::string signalCause; 
 } sigInfo;
 class SI {
 private:
@@ -52,16 +53,15 @@ private:
         {30, "SIGUSR1","terminate process","User defined signal 1"}, \
         {31, "SIGUSR2","terminate process","User defined signal 2"}
     };
-    const string comma = ", ";
+    const std::string comma = ", ";
    
 public:
-    map<int, sigInfo> allTheSigs;
+    std::map<int, sigInfo> allTheSigs;
     int i = 0; //i, the ubiquitous loop counter.
-    int size = sizeof(si);
+    int size_of_base_class_named_si = sizeof(si);
     SI(void);
     ~SI(void);
     void signalDescription (int sigNumber) ;
+    
 };
-
-
 #endif /* signalDescription_h */
