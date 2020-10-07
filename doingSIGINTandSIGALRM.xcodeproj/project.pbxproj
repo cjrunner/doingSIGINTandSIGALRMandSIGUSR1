@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2B053507252361F300394C1E /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2B053506252361F300394C1E /* main.cpp */; };
+		2B3C5C29252C87B100DA672F /* signalDescription.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2B3C5C28252C87B100DA672F /* signalDescription.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -26,6 +27,8 @@
 		2B053503252361F300394C1E /* doingSIGINTandSIGALRMandSIGUSR1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = doingSIGINTandSIGALRMandSIGUSR1; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B053506252361F300394C1E /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		2B05350E2523624100394C1E /* doingSigIntANDSigAlrm.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = doingSigIntANDSigAlrm.hpp; sourceTree = "<group>"; };
+		2B3C5C28252C87B100DA672F /* signalDescription.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = signalDescription.cpp; sourceTree = "<group>"; };
+		2B3C5C2A252CAE4000DA672F /* signalDescription.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = signalDescription.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +62,8 @@
 			isa = PBXGroup;
 			children = (
 				2B053506252361F300394C1E /* main.cpp */,
+				2B3C5C28252C87B100DA672F /* signalDescription.cpp */,
+				2B3C5C2A252CAE4000DA672F /* signalDescription.hpp */,
 				2B05350E2523624100394C1E /* doingSigIntANDSigAlrm.hpp */,
 			);
 			path = doingSIGINTandSIGALRM;
@@ -120,6 +125,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2B3C5C29252C87B100DA672F /* signalDescription.cpp in Sources */,
 				2B053507252361F300394C1E /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

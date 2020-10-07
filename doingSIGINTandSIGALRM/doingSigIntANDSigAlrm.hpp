@@ -9,27 +9,70 @@
 #ifndef doingSigIntANDSigAlrm_hpp
 #define doingSigIntANDSigAlrm_hpp
 
-
-
+#include <atomic>
 #include <iostream>
 #include <queue>
 #include <chrono>
 #include <exception>
 #include <ctime>
+#include <csignal>
+#include <map>
+#include <list>
 #include <locale>
 #include <sstream> //StringStream
-#include <stdio.h>
-#include <signal.h> 
+// #include <stdio.h>
+//#include <signal.h> 
 #include <setjmp.h>
 #include <unistd.h>
 #include <cstdlib>
 #include <sys/types.h>
 #include <time.h>
 #include <stdlib.h>
+#define zERO 0
+#define SIGUNKNOWNJUMP  zERO
 #define SIGINTSETJUMP   1
 #define SIGALRMSETJUMP  2
 #define SIGUSR1SETJUMP  3
+#define SIZECIRCULARBUFFER  NUMBEROFELEMENTSINCIRCULARARRAY
+#define ONE  1
+#define ZERO zERO
+#define SLEEPTIME  10
+#define TIMESIZE   32
 using namespace  std;
+typedef struct sigmap {
+    int8_t signumber;
+    const char *signame;
+    const char *sigaction;
+    const char *sigdescription;
+} sigmap;
+typedef struct twoUINT8s {
+    atomic<uint8_t>flags;
+    uint8_t siteid; //Currently, siteid has a max value of 28-decimal, so 8 bits should be sufficient to hold siteid
+} twoINT8s;
+typedef struct circularArray {
+#define NUMBEROFELEMENTSINCIRCULARARRAY 28
+#define MAXINDEXNUMBER NUMBEROFELEMENTSINCIRCULARARRAY-1
+#define FLAGS_NOTINUSE      0b00000000
+#define FLAGS_INUSE         0b10000000
+#define FLAGS_SIGNUMBERMASK 0b10011111
+#define VLAGS_UNKNOWNSIG    0b01000000
+    char c1 = '\0';
+    char c2 = '\0';
+    union u2x8 {
+        u_int16_t flag;
+        twoINT8s int8s; //see above struct, named twoINT8s, for definition of twoINT8s
+    } u2x8;
+//    int8_t entryNumber;
+//    int8_t signal; //Range from 0 to 31
+    pid_t  myprocessid = ATOMIC_VAR_INIT(0); //Initialize with myprocessid of 0;
+    std::chrono::high_resolution_clock::time_point start_tp; //Note that time point is 12 hex characters, or 48-bits, long! \
+    representing 2^48 microseconds, since ratio looks like its defining 1 second = 1000000:\
+__d_ std::__1::chrono::time_point<std::__1::chrono::system_clock, std::__1::chrono::duration<long long, std::__1::ratio<1, 1000000> > >::duration
+    std::chrono::high_resolution_clock::time_point stop_tp;
+    circularArray *ptrToNext;
+    circularArray *ptrToPrevious;
+} circularArray;
+#ifdef QUEUE
 typedef struct  {
     unsigned int entryNumber;
     int  mysignal;
@@ -39,23 +82,32 @@ typedef struct  {
     __d_    std::__1::chrono::time_point<std::__1::chrono::system_clock, std::__1::chrono::duration<long long, std::__1::ratio<1, 1000000> > >::duration
 } QE;
 template <class T, class Container = deque<T> > class myqueue;
+#endif
+
 class MySig {
+typedef void (*p)(MySig *,unsigned int);
+#define MEMBERFUNCTIONSTHATDOSIGHANDLERPOSTPROCESSING 0
+#define MEMBER_FUNCTIONS_THAT_WRANGLE_SIGHANDLER_EXECUTION_TIME 1
 private:
-    
-    unsigned char MySigstart = 'S'; 
-    unsigned char rest[14] = {'T','A','R','T',' ','O','F',' ','m','y','S','I','G','\0'};
-    static const int ONE = 1;
-    static const int SLEEPTIME = 10;
-    static const int TIMESIZE = 32;
+
     
 public:
+    unsigned int sizeOfMySig;
+    bool d;
+    bool cas;
+    pid_t myProcessID;
+    p ptrToFunction[4][2];
+
+#ifdef QUEUE
     QE oneQueueElement;
+    ostringstream oss;
+#endif
     struct std::tm tt;
     long setJumpValue;
     bool dojustonce;
     string timeReturned;
     char work[32];
-    ostringstream oss;
+
 //    string oss;
     char  c;
     siginfo_t sigINFO;
@@ -80,7 +132,12 @@ public:
     size_t rcsz;
 //    pid_t waitPID;
     std::string timePointAsString (const std::chrono::system_clock::time_point& );
-//    int qvalue;
+#ifdef QUEUE
+    int qvalue;
+#endif
+    map<int, p> ptf;
+    long accumulateSIGALRMtimes  = 0;
+    long accumulateSIGALRMcounts = 0;
     int envVariableCounter=0;
     string formattedTime;
     tm* nowTM;
@@ -88,17 +145,38 @@ public:
     locale locC;
     MySig(void) noexcept(true);
     ~MySig(void);
+    void signalDescription (int );
     unsigned char *getQstart(void);
+    static void sigUNKNOWN_handler(int );
+    static void sigusr1_handler(int);
     static void sigalarm_handler(int);   //This SIGALRM handler
     static void INThandler(int);               /* the Ctrl-C handler       */
-    static void sigusr1_handler(int); // the SIGSUR1 signal handler
-
+    static void doSIGINT(MySig *,unsigned int);
+    static void doSIGALRM(MySig *,unsigned int);
+    static void doSIGUSR1(MySig *,unsigned int);
+    static void doUNKNOWNSIGNAL(MySig *,unsigned  int);
+    static void manageCircularArray(MySig *,unsigned int );
+    static void wrangleSIGALRMstartTime(MySig *, unsigned int );
+    static void wrangleSIGINTstartTime(MySig *, unsigned int );
+    static void wrangleSIGUSR1startTime(MySig *, unsigned int );
+    static void wrangleSIGUNKNOWNstartTime(MySig *, unsigned int);
+    int indexOfActiveElement = 0;
+    circularArray A[NUMBEROFELEMENTSINCIRCULARARRAY];
+    circularArray* ptr_begin = &A[0];
+    circularArray* ptr_end   = &A[NUMBEROFELEMENTSINCIRCULARARRAY-1];
+    circularArray* ptr_Active_Element = ptr_begin;
+    atomic<circularArray *>ptr_Available_Element; // = ptr_begin;
+/*
+    atomic<circularArray *>pae;
+    circularArray *paeWAS;
+    circularArray *pAE;
+*/
+//
+#ifdef QUEUE
+    list<QE> *ptrl;
+    list<QE> l;
     queue<QE> *ptrq; //Points to `q`
-    unsigned char qs[8] = {'q',' ','S','T','A','R','T','-'};
-    unsigned char qsstart = '>';
     queue<QE> q; //Queue is a queue of elements of type QE which is a struct as defined via the above `typedef struct` statement;
-    unsigned char qsend = '<';
-    unsigned char qendc[13] = {'-','E','N','D',' ','O','F',' ','m','y','S','I','G'};
-    unsigned char qend = '\0';
+#endif
 }; 
 #endif /* doingSigIntANDSigAlrm_hpp */
